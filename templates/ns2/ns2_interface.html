@@ -1,0 +1,980 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>ns2web: A web interface for simulation with ns-2</title>
+        <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}css/isad.css">
+        <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}css/ns2workspace.css">
+        
+        <style type="text/css">
+            .table-title-blue {
+                margin-bottom: 5px;
+                padding-bottom: 3px;
+                padding-top: 20px;
+                font-size: 1.1em;
+            }
+            
+            #contentBox {
+                font-size: 1.1em;
+            }
+            #contentBox table.techno {
+                font-size: 1em;
+            }
+            .input-container {
+                margin-left: 10px;
+                margin-right: 30px;
+                padding: 7px;
+                border: 1px dotted silver;
+            }
+            .no-bullet {
+                 list-style-type: none;
+            }
+            td.legendLabel {
+                font-size: 1.1em;
+            }
+        </style>
+    </head>
+
+
+    <body>
+      
+        <div id="contentBoxBack">
+            <div class="header" style="background-color: #E3F2FC; padding-top: 10px; 
+                 padding-bottom: 10px; padding-left: 25px; border-bottom: 1px solid #E3F2FC;">
+                <h1 class="site-header" style="">Ns2web</h1>
+                <h2 class="site-sub-header">A Web-based platform for interactive simulation and analysis with NS-2</h2>
+            </div>
+            
+            <div id="contentBox" style="padding-top: 25px; padding-bottom: 20px;">
+                <div class="ns2-form">
+                    <form action="" method="post">
+                        {% csrf_token %}
+                        
+                        <div class="ns2-gui">
+                            <h3 class="table-title-blue" style="margin-top: -10px; padding-top: 0;">Guided Scenario Generator</h3>
+                            <div class="input-container">
+                                Please select simulation mode: 
+                                <select id="simulation-mode">
+                                    <option value="-1" selected>Simulation mode</option>
+                                    <option value="wired">Wired</option>
+                                    <option value="wireless">Wireless</option>
+                                </select>
+                            </div>
+                            
+                            <div id="ns2-gui-dialogue">
+                                
+                                <h3 class="table-title-blue">Add Nodes</h3>
+                                <div class="input-container">
+                                    ( <input type="checkbox" id="random-nodes"> 
+                                    <label for="random-nodes">Random</label> )
+                                     # of nodes <input type="text" style="width: 40px;" id="n-nodes">
+                                    <input type="button" value="Add" id="add-nodes">
+                                </div>      
+
+                                <div id="for-wired">
+                                    <h3 class="table-title-blue">Create Wired Link</h3>
+                                    <div class="input-container">
+                                        From
+                                        <select id="from-node-number" class="node-numbers">
+                                            <option value="-1">Node #</option>
+                                        </select>
+                                        to
+                                        <select id="to-node-number" class="node-numbers">
+                                            <option value="-1">Node #</option>
+                                        </select>
+                                        a
+                                        <select id="link-type">
+                                            <option value="-1">Link Type</option>
+                                            <option value="simplex-link">Simplex</option>
+                                            <option value="duplex-link">Duplex</option>
+                                        </select>
+                                        link having <strong>bandwidth</strong>
+                                        <input type="text" id="link-bandwidth" value="1" style="width: 50px;"> <i>Mb</i>
+                                        <br>
+                                        with <strong>delay</strong> of
+                                        <input type="text" id="link-delay" value="10" style="width: 40px;"> <i>ms</i>    
+                                        , <strong>queue</strong> type
+                                        <select id="link-q-type">
+                                            <option value="-1">Link Queue</option>
+                                            <option value="DropTail">DropTail</option>
+                                            <option value="RED">RED</option>
+                                            <option value="FQ">FQ</option>
+                                            <option value="SFQ">SFQ</option>
+                                        </select>
+                                        and <strong>queue</strong> size 
+                                        <input type="text" id="link-q-size" value="50" style="width: 50px;">
+                                        <br>
+                                        <input type="button" value="Add" id="add-link">
+                                    </div>
+
+                                    <h3 class="table-title-blue">List of Wired Links</h3>
+                                    <div class="input-container">
+                                        <table id="links-list" class="techno">
+                                            <thead>
+                                                <tr>
+                                                    <th>From</th>
+                                                    <th>To</th>
+                                                    <th>Link Type</th>
+                                                    <th>Bandwidth</th>
+                                                    <th>Delay</th>
+                                                    <th>Queue Type</th>
+                                                    <th>Queue Size</th>
+                                                    <th></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            
+                                <div id="for-wireless">
+                                    <h3 class="table-title-blue">Scenario Dimensions</h3>
+                                    <div class="input-container">
+                                        A rectangular world of 
+                                        <label for="topo-width">width</label>
+                                        <input type="text" style="width: 55px;" value="500" id="topo-width">
+                                        <i>meter</i>
+                                        and 
+                                        <label for="topo-height">height</label>
+                                        <input type="text" style="width: 55px;" value="300" id="topo-height">
+                                        <i>meter</i>
+                                        <!--input type="button" value="Set Dimensions" id="topo-dimensions"-->
+                                    </div>
+                                                           
+                                    <h3 class="table-title-blue">Node Position</h3>
+                                    <div class="input-container">
+                                        <ul>
+                                            <li class="no-bullet">
+                                                <select id="node-number" class="node-numbers">
+                                                <option value="-1">Node #</option>
+                                                </select>
+                                                is initially located at
+                                                <strong>x</strong>-coordinate <input type="text" style="width: 55px;" id="x-coord">
+                                                <i>meter</i>
+                                                and <strong>y</strong>-coordinate <input type="text" style="width: 55px;" id="y-coord">
+                                                <i>meter</i>
+                                            </li>
+                                            <li class="no-bullet" style="padding-top: 5px;">
+                                                <input type="checkbox" id="random-motion">
+                                                <label for="random-motion">This node moves randomly</label>
+                                                <input type="button" value="Set Position" id="node-position">
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <h3 class="table-title-blue">List of Nodes</h3>
+                                    <div class="input-container">
+                                        <table id="nodes-list" class="techno">
+                                            <thead>
+                                                <tr>
+                                                    <th>Node #</th>
+                                                    <th>x-coordinate</th>
+                                                    <th>y-coordinate</th>
+                                                    <th>Random Motion</th>
+                                                    <th></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <h3 class="table-title-blue">Configure Wireless Links</h3>
+                                    <div class="input-container">
+                                        MAC Type
+                                        <select id="wireless-mac">
+                                            <option value="-1">Select MAC</option>
+                                            <option value="Mac/802_11" selected="selected">MAC/802.11</option>
+                                        </select>
+                                        <br>
+                                        Queue Type
+                                        <select id="wireless-queue">
+                                            <option value="-1">Select Queue</option>
+                                            <option value="Queue/DropTail">DropTail</option>
+                                            <option value="Queue/DropTail/PriQueue">DropTail/PriQueue</option>
+                                            <option value="CMUPriQueue">CMUPriQueue</option>
+                                        </select>
+                                        &nbsp; and Queue Size <input type="text" value="50" id="wireless-q-len" style="width: 40px;"> 
+                                        <br>
+                                        Routing Protocol
+                                        <select id="wireless-routing-protocol">
+                                            <option value="-1">Select Protocol</option>
+                                            <option value="AODV">AODV</option>
+                                            <option value="DSDV">DSDV</option>
+                                            <option value="DSR">DSR</option>
+                                            <option value="TORA">TORA</option>
+                                        </select>
+                                        <!--br>
+                                        <input type="button" value="Set Parameters" id="set-wireless-parameters"-->
+                                    </div>
+
+                                    <h3 class="table-title-blue">Event Tracing</h3>
+                                    <div class="input-container">
+                                        Record event trace at levels:   &nbsp;
+                                        <input type="checkbox" value="agentTrace" id="agent-trace">
+                                        <label for="agent-trace">Agent</label> &nbsp;
+                                        <input type="checkbox" value="routerTrace" id="router-trace">
+                                        <label for="router-trace">Router</label> &nbsp;
+                                        <input type="checkbox" value="macTrace" id="mac-trace">
+                                        <label for="mac-trace">MAC</label> &nbsp;
+                                    </div>
+                                </div>
+
+                                <h3 class="table-title-blue">Add Agent &amp; Application</h3>
+                                <div class="input-container">
+                                    <strong>Source</strong> 
+                                    <select id="src-agent">
+                                        <option value="-1">Agent Type</option>
+                                        <option value="Agent/TCP">TCP</option>
+                                        <option value="Agent/TCP/Reno">TCP/Reno</option>
+                                        <option value="Agent/TCP/Vegas">TCP/Vegas</option>
+                                        <option value="Agent/TCP/Sack1">TCP/Sack1</option>
+                                        <option value="Agent/TCP/Fack">TCP/Fack</option>
+                                        <option value="Agent/UDP">UDP</option>
+                                    </select>
+                                    with packet size <input type="text" id="pkt-size" value="1500" style="width: 70px;"> <i>byte</i>
+                                    attached to node
+                                    <select id="src-agent-node" class="node-numbers">
+                                        <option value="-1">Node #</option>
+                                    </select>
+                                    <br>
+                                    to <strong>Sink</strong>
+                                    <select id="dst-agent">    
+                                        <option value="-1">Agent Type</option>
+                                        <option value="Agent/TCPSink">TCPSink</option>
+                                        <option value="Agent/TCPSink/Sack1">TCPSink/Sack1</option>
+                                        <option value="Agent/TCPSink/DelAck">TCPSink/DelAck</option>
+                                        <option value="Agent/Null">Null</option>
+                                    </select>
+                                    attached to
+                                    <select id="dst-agent-node" class="node-numbers">
+                                        <option value="-1">Node #</option>
+                                    </select>
+                                    <br>
+                                    <strong><i>Traffic Type</i></strong>
+                                    <ul>
+                                        <li class="no-bullet">
+                                            <input type="radio" name="traffic-type" id="traffic-ftp" value="Application/FTP">
+                                            <label for="traffic-ftp">FTP</label>
+                                        </li>
+                                        <li class="no-bullet">
+                                            <input type="radio" name="traffic-type" id="traffic-cbr" value="Application/Traffic/CBR">
+                                            <label for="traffic-cbr">CBR at a rate</label>
+                                            <input type="text" id="cbr-rate" value="1" style="width: 50px;"> <i>Mb</i>
+                                            with packet size <input type="text" id="cbr-size" value="1500" style="width: 50px;"> <i>byte</i>
+                                        </li>
+                                    </ul>
+                                    <br>                                
+                                    Traffic <strong>starts</strong> at <input type="text" id="traffic-start" value="" style="width: 40px;"> <i>second</i>
+                                    and <strong>ends</strong> at <input type="text" id="traffic-stop" value="" style="width: 40px;"> <i>second</i>
+                                    <br>
+
+                                    <input type="button" value="Add" id="connect-agent">
+                                </div>
+
+                                <h3 class="table-title-blue">List of Traffic Agents &amp; Applications</h3>
+                                <div class="input-container">
+                                    <table id="agents-list" class="techno">
+                                        <thead>
+                                            <tr>
+                                                <th>Agent (From)</th>
+                                                <th>Packet Size</th>
+                                                <th>Application</th>
+                                                <th>CBR Rate</th>
+                                                <th>CBR Size</th>
+                                                <th>Attached To</th>
+                                                <th>Agent (To)</th>
+                                                <th>Attached To</th>
+                                                <th>Traffic Start</th>
+                                                <th>Traffic Stop</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            
+                                <h3 class="table-title-blue">Simulation Settings</h3>
+                                <div class="input-container">
+                                    Simulation stops at 
+                                    <input type="text" id="simulation-stop" style="width: 40px;"> 
+                                    <i>second</i>
+                                    <br>Simulation <strong>trace file</strong> name is 
+                                    <input type="text" id="simulation-trace"> 
+                                    <!--br>
+                                    <input type="button" value="Set Parameters" id="simulation-settings"-->
+                                </div>
+
+                                <br>
+
+                                <button type="button" id='generate-script' class="button-icon">
+                                    <img src="/ns2web/xmedia/images/new/icons/workspace/next24x24.png"
+                                         class="button-image buttonText button-run">
+                                    <strong>Generate Script</strong>
+                                </button>
+                            </div>
+                        </div>        
+                        
+                        
+                        <br>
+                        
+                        
+                        <div class="ns2-code">
+                            <textarea id="ns2code" style="width: 920px; height: 474px;" name="ns2code">{{ default_code }}</textarea>
+                        </div>
+                        <div class="ns2-code-submit centerAlign">
+                            <button type="button" id='run' class="button-icon">
+                                <img src="/ns2web/xmedia/images/new/icons/workspace/next24x24.png"
+                                     class="button-image buttonText button-run">
+                                <strong>Run!</strong>
+                            </button>
+                            <button type="button" id='clear' class="button-icon button-reset-icon">
+                                <img src="/ns2web/xmedia/images/new/icons/workspace/edit_clear24x24_b.png"
+                                     class="button-image buttonText button-clear">
+                                Clear
+                            </button>
+                        </div>
+
+                        <h3>Output</h3>
+                        <div class="ns2-code-output">
+                        </div>
+
+                        <div class="filter-output" style="margin-top: 10px; margin-bottom: 5px;">
+                            <label for="filter-pattern">Filter the above output by the following string</label>
+                            <input type="text" name="filter-pattern" id="filter-pattern" style="width: 350px;">
+                            <input type="button" value="Filter" id="filter-btn">
+                            <br>
+                            <div class="filtered-output">
+                            </div>
+                            <div style="margin-top: 7px; display: inline;">
+                                Found <span id="pattern-match-count">0</span> occurrence(s) of the search string
+                            </div>
+                        </div>
+
+                        <h2>Trace File</h2>
+                        <textarea class="ns2-trace-text wordwrap"></textarea>
+
+
+                        <div style="height: 15px; border: 0;">&nbsp;</div>
+
+                        <h3 class="table-title-blue">Trace File Analysis</h3>
+                        <div id="trace-file-analysis" style="padding: 5px;">
+                            <div id="dummy"></div>
+
+                            <div class="toolbar-other">
+                                <ul class="toolbar-buttons">
+                                    <li><strong>Simulation mode:</strong>
+                                        <input type="radio" name="trace-file-mode" class="trace-file-mode" value="Wired">Wired
+                                        <input type="radio" name="trace-file-mode" class="trace-file-mode" value="Wireless">Wireless (New)
+                                        <input type="radio" name="trace-file-mode" class="trace-file-mode" value="Satellite">Satellite
+                                        <input type="radio" name="trace-file-mode" class="trace-file-mode" value="Mixed">Mixed
+                                    </li>
+                                    <li class="last-item" id="clear-session" style="padding-left: 5px;"><a href="/" title="Clear current session">Clear Session</a></li>
+                                </ul>
+                            </div>
+
+                            <div class="toolbar" style="height: auto; margin-top: 0; display: none;">
+                                <ul class="toolbar-buttons">
+                                    <li><a href="#" id="gen-stats" title="Get simulation statistics">General Statistics</a></li>
+                                    <li><a href="#" id="avg-thruput-dialog" title="Get average throughput of a node">Average Throughput</a></li>
+                                    <li><a href="#" id="bytes-rcvd-dialog" title="Plot bytes received by a node (cumulative sum)">Bytes Received</a></li>
+                                    <li><a href="#" id="e2e-delay-dialog" title="Plot end-to-end delay between two nodes">End-to-end Delay</a></li>
+                                    <li><a href="#" id="pkt-retransmit-dialog" title="Plot packet retransmission count between two nodes">Packet Retransmissions</a></li>
+                                    <li class="last-item"><a href="#" id="hop-cnt-vs-seq-num-dialog" title="Plot hop count vs. sequence #s of packets sent between two nodes">Hop Count</a></li>
+                                </ul>
+                            </div>
+
+                            <style type="text/css">
+                                .entry #contents table {
+                                    margin-left: 0;
+                                    margin-right: 0;
+                                    text-align: left;
+                                    width: auto;
+                                }
+                            </style>
+
+                            <div class="bluish marginT5" style="padding: 5px;">
+                                <div id="plotarea" style="margin-top: 10px;"></div>
+
+                                <h3 class="marginT5">Legend</h3>
+                                <div id="graphs-plotted" style="border: 1px dotted silver; width: 900px; font-size: 1.2em;">
+                                </div>
+                            </div>
+
+                            <div style="height: 15px; border: 0;">&nbsp;</div>
+      
+                            <h2>Plot Custom Data</h2>
+                            <div>
+                                <label for="plot-label">Plot Title</label> <input type="text" id="plot-label">
+                                <br>
+                                <textarea rows="10" cols="65" id="custom-plot-data" name="custom-plot-data">x_val, y_val</textarea>
+                                <br>
+                                <label for="x-axis-label">X-axis label:</label> <input type="text" id="x-axis-label">
+                                <label for="y-axis-label">Y-axis label:</label> <input type="text" id="y-axis-label">
+                                <br>
+                                <button id="custom-plot">
+                                  Plot
+                                </button>
+                                <br>
+                            </div>
+      
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+            
+            <div class="footer" 
+                 style="background-color: #5CADFF; padding-top: 3px; padding-bottom: 3px; 
+                 font-size: 0.95em; text-align: center; color: white; border-top: 1px solid #E3F2FC;">
+                Copyright &COPY; 2011 Barun Saha
+            </div>
+            
+        </div>
+
+        <script type="text/javascript" src="{{ MEDIA_URL }}js/jquery.min.js"></script>
+        <script type="text/javascript" src="{{ MEDIA_URL }}lib/TextArea_Resizer_1.0.4/jquery.textarearesizer.min.js"></script>
+        <script language="Javascript" type="text/javascript" src="{{ MEDIA_URL }}lib/editarea_0_8_2/edit_area/edit_area_full.js"></script>
+        <script type="text/javascript" src="{{ MEDIA_URL }}lib/smart_js_polling.js"></script>
+        <script type="text/javascript" src="{{ MEDIA_URL }}js/ant/ns2workspace.js"></script>
+        <script type="text/javascript" src="{{ MEDIA_URL }}js/enhancements.js"></script>
+        <!--script type="text/javascript" src="{{ MEDIA_URL }}lib/jquery.expose.min.js"></script-->
+
+        <link href="{{ MEDIA_URL }}css/jquery-ui.css" rel="stylesheet" type="text/css">
+        <script type="text/javascript" src="{{ MEDIA_URL }}js/jquery-ui.min.js"></script>
+        <!--[if IE]><script type="text/javascript" src="{{ MEDIA_URL }}js/excanvas.min.js"></script><![endif]-->
+        <script language="javascript" type="text/javascript" src="{{ MEDIA_URL }}lib/flot/jquery.flot.min.js"></script>
+        <script language="javascript" type="text/javascript" src="{{ MEDIA_URL }}lib/flot/flot-axislabels/jquery.flot.axislabels.min.js"></script>
+        <script language="javascript" type="text/javascript" src="{{ MEDIA_URL }}lib/flot/jquery.flot.navigate.min.js"></script>
+        <script language="javascript" type="text/javascript" src="{{ MEDIA_URL }}lib/flot/jquery.flot.crosshair.min.js"></script>       
+        
+        
+        <script type="text/javascript">
+            
+            $(document).ready(function() {
+
+                var remove_image = '/ns2web/xmedia/images/new/icons/remove16x16.png';
+                var error_color = 'orange';
+                
+                $('#ns2-gui-dialogue').hide();
+                
+                
+                // Display options as per the simulation mode
+                $('#simulation-mode').change(function(){
+                    var mode = $(this).val();
+                    if ( mode == 'wired' ) {
+                        $('#ns2-gui-dialogue').show();                        
+                        $('#for-wireless').fadeOut();
+                        $('#for-wired').fadeIn();
+                    } else if ( mode == 'wireless' ) {
+                        $('#ns2-gui-dialogue').show();
+                        $('#for-wired').fadeOut();                        
+                        $('#for-wireless').fadeIn();                        
+                    } else {
+                        $('#ns2-gui-dialogue').hide();
+                    }
+                });
+                
+                // Add nodes
+                $('#random-nodes').change(function() {
+                    if ( $(this).attr('checked') ) {
+                        var randomx = Math.floor( Math.random() * 100 + 1 );
+                        $('#n-nodes').val(randomx);
+                    }                        
+                    else
+                        $('#n-nodes').val('');
+                });
+                $('#add-nodes').click(function() {
+                    var nodes = $('#n-nodes').val();
+                    nodes = parseInt(nodes) || 2;
+                    $('.node-numbers').empty();
+                    $('.node-numbers').append(
+                        $( document.createElement('option') ).attr('value', -1).text('Node #')
+                    )
+                    for ( var i = 0; i < nodes; i++ ) {                        
+                        $('.node-numbers').append(
+                            $( document.createElement('option') ).attr('value', i).text(i)
+                        )
+                    }
+                });
+
+                // Position nodes -- wireless
+                $('#node-position').click(function() {
+                    var node_id = $('#node-number option:selected').val();
+                    if (node_id == -1) {
+                        alert('Please select a node!');
+                        $("html, body").filter(':not(:animated)').animate({scrollTop: $('#node-number').offset().top}, 800);                        
+                        return;
+                    }
+                    var xpos = parseFloat($('#x-coord').val()) || -1;
+                    if (xpos < 0) {
+                        alert('Please specify a non-negative value for x-coordinate!');
+                        $("html, body").filter(':not(:animated)').animate({scrollTop: $('#x-coord').offset().top}, 800);
+                        return;
+                    }
+                    var ypos = parseFloat($('#y-coord').val()) || -1;           
+                    if (ypos < 0) {
+                        alert('Please specify a non-negative value for y-coordinate!');
+                        $("html, body").filter(':not(:animated)').animate({scrollTop: $('#y-coord').offset().top}, 800);
+                        return;
+                    }         
+                    var random_motion = $('#random-motion').is(':checked') ? 'Yes' : 'No';
+
+                    var a_row = $(document.createElement('tr'));
+                    a_row
+                    .append(
+                        $(document.createElement('td')).append(node_id)
+                    )
+                    .append(
+                        $(document.createElement('td')).append(xpos)
+                    )
+                    .append(
+                        $(document.createElement('td')).append(ypos)
+                    )
+                    .append(
+                        $(document.createElement('td')).append(random_motion)
+                    )
+                    .append(
+                        $(document.createElement('td')).append(
+                            $(document.createElement('img'))
+                            .attr('src', remove_image)
+                            .click(function() {
+                                $(this).parent().parent().remove();
+                            })
+                        )
+                    )
+                    .appendTo('#nodes-list tbody');
+                    $(a_row).effect("highlight", 2500);
+                });
+                
+                // Create a wired link
+                $('#add-link').click(function() {
+                    var src_node = $('#from-node-number option:selected').val();
+                    if (src_node == '-1') {
+                        alert('Please select a source node!');
+                        $("html, body").filter(':not(:animated)').animate({scrollTop: $('#from-node-number').offset().top}, 800);
+                        return;
+                    }
+                    
+                    var dst_node = $('#to-node-number option:selected').val();                    
+                    if (dst_node == '-1') {
+                        alert('Please select a destination node!');
+                        $("html, body").filter(':not(:animated)').animate({scrollTop: $('#to-node-number').offset().top}, 800);
+                        return;
+                    }
+                    
+                    var link_type = $('#link-type option:selected').val();
+                    if (link_type == '-1') {
+                        alert('Please specify a link type!');
+                        $("html, body").filter(':not(:animated)').animate({scrollTop: $('#link-type').offset().top}, 800);
+                        return;
+                    }                    
+                 
+                    var bw = parseFloat($('#link-bandwidth').val()) || -1;
+                    if (bw < 0) {
+                        alert('Please specify a positive value for bandwidth!');
+                        $("html, body").filter(':not(:animated)').animate({scrollTop: $('#link-bandwidth').offset().top}, 800);
+                        return;
+                    }
+                    
+                    var delay = parseFloat($('#link-delay').val()) || -1;
+                    if (delay < 0) {
+                        alert('Please specify a non-negative value for link delay!');
+                        $("html, body").filter(':not(:animated)').animate({scrollTop: $('#link-delay').offset().top}, 800);
+                        return;
+                    }
+                    
+                    var q_type = $('#link-q-type option:selected').val();
+                    if (q_type < 0) {
+                        alert('Please select an interface queue type!');
+                        $("html, body").filter(':not(:animated)').animate({scrollTop: $('#link-q-type').offset().top}, 800);
+                        return;
+                    }
+                    
+                    var q_size = parseInt($('#link-q-size').val()) || -1;
+                    if (q_size < 0) {
+                        alert('Please specify a non-negative value for queue size!');
+                        $("html, body").filter(':not(:animated)').animate({scrollTop: $('#link-q-size').offset().top}, 800);
+                        return;
+                    }
+                    
+                    var row = $( document.createElement('tr') );
+                    row
+                    .append(
+                        $( document.createElement('td') ).append( src_node )                        
+                    )
+                    .append(
+                        $( document.createElement('td') ).append( dst_node )
+                    )
+                    .append(
+                        $( document.createElement('td') ).append( link_type )
+                    )
+                    .append(
+                        $( document.createElement('td') ).append( bw )
+                    )
+                    .append(
+                        $( document.createElement('td') ).append( delay )
+                    )
+                    .append(
+                        $( document.createElement('td') ).append( q_type )
+                    )
+                    .append(
+                        $( document.createElement('td') ).append( q_size )
+                    )
+                    .append(
+                        $(document.createElement('td')).append(
+                            $(document.createElement('img'))
+                            .attr('src', remove_image)
+                            .click(function() {
+                                $(this).parent().parent().remove();
+                            })
+                        )
+                    )
+                    .appendTo( $('table#links-list tbody'))
+                    $(row).effect("highlight", 2500);                    
+                });
+
+
+                // Add agent & application
+                $('#connect-agent').click(function() {
+                    var src_agt = $('#src-agent :selected').val();
+                    if (src_agt == '-1') {
+                        alert('Please select the agent at the traffic source!');
+                        $("html, body").filter(':not(:animated)').animate({scrollTop: $('#src-agent').offset().top}, 800);
+                        $('#src-agent :selected').focus();
+                        return;
+                    }
+                    
+                    var src_node = $('#src-agent-node option:selected').val();
+                    if (src_node == '-1') {
+                        alert('Please specify the node # to which the source agent is attached!');
+                        $("html, body").filter(':not(:animated)').animate({scrollTop: $('#src-agent-node').offset().top}, 800);
+                        return;
+                    }
+                    
+                    var src_pkt_size = parseInt($('#pkt-size').val()) || -1;
+                    if (src_pkt_size < 1) {
+                        alert('Packet size for an agent type must be positive!');
+                        $("html, body").filter(':not(:animated)').animate({scrollTop: $('#pkt-size').offset().top}, 800);
+                        return;
+                    }
+                    
+                    var sink_agt = $('#dst-agent option:selected').val();
+                    if (sink_agt == '-1') {
+                        alert('Please select the agent at the traffic sink!');
+                        $("html, body").filter(':not(:animated)').animate({scrollTop: $('#dst-agent').offset().top}, 800);                        
+                        return;
+                    }
+                    
+                    var sink_node = $('#dst-agent-node :selected').val();
+                    if (sink_node == '-1') {
+                        alert('Please specify the node # to which the sink agent is attached!');
+                        $("html, body").filter(':not(:animated)').animate({scrollTop: $('#dst-agent-node').offset().top}, 800);
+                        return;
+                    }
+                    
+                    var traffic_type = $('input:radio[name="traffic-type"]:checked').val();
+                    if (! traffic_type) {
+                        alert('Please select traffic type!');
+                        $("html, body").filter(':not(:animated)').animate({scrollTop: $('#traffic-ftp').offset().top}, 800);
+                        return;
+                    }
+
+                    var cbr_rate = parseFloat($('#cbr-rate').val()) || -1;
+                    if (cbr_rate < 0) {
+                        alert('Please specify a non-negative value for CBR rate!');
+                        $("html, body").filter(':not(:animated)').animate({scrollTop: $('#cbr-rate').offset().top}, 800);
+                        return;
+                    }
+                    
+                    var cbr_pkt_size = parseFloat($('#cbr-size').val()) || -1;
+                    if (cbr_pkt_size < 0) {
+                        alert('Please specify a non-negative value for CBR packet size!');
+                        $("html, body").filter(':not(:animated)').animate({scrollTop: $('#cbr-size').offset().top}, 800);
+                        return;
+                    }
+                    
+                    var traffic_start = parseFloat($('#traffic-start').val()) || -1;
+                    if (traffic_start < 0) {
+                        alert('Please specify a non-negative value for traffic start time!');
+                        $("html, body").filter(':not(:animated)').animate({scrollTop: $('#traffic-start').offset().top}, 800);
+                        return;
+                    }
+                    
+                    var traffic_stop = parseFloat($('#traffic-stop').val()) || -1;
+                    if (traffic_stop < 0) {
+                        alert('Please specify a non-negative value for traffic stop time!');
+                        $("html, body").filter(':not(:animated)').animate({scrollTop: $('#traffic-stop').offset().top}, 800);
+                        return;
+                    }
+
+                    // Add a row
+                    var row = $( document.createElement('tr') );
+                    row
+                    .append(
+                        $(document.createElement('td')).append(src_agt)
+                    )
+                    .append(
+                        $(document.createElement('td')).append(src_pkt_size)
+                    )
+                    .append(
+                        $(document.createElement('td')).append(traffic_type)
+                    )
+                    .append(
+                        $(document.createElement('td')).append(cbr_rate)
+                    )
+                    .append(
+                        $(document.createElement('td')).append(cbr_pkt_size)
+                    )
+                    .append(
+                        $(document.createElement('td')).append(src_node)
+                    )
+                    .append(
+                        $(document.createElement('td')).append(sink_agt)
+                    )
+                    .append(
+                        $(document.createElement('td')).append(sink_node)
+                    )
+                    .append(
+                        $(document.createElement('td')).append(traffic_start)
+                    )
+                    .append(
+                        $(document.createElement('td')).append(traffic_stop)
+                    )
+                    .append(
+                        $(document.createElement('td')).append(
+                            $(document.createElement('img'))
+                            .attr('src', remove_image)
+                            .click(function() {
+                                $(this).parent().parent().remove();
+                            })
+                        )
+                    )
+                    .appendTo('#agents-list tbody');
+                    $(row).effect("highlight", 2500);
+                });
+
+
+                // Generate simulation script from user inputs
+                $('#generate-script').click(function() {
+                    var EOL = '\n';
+                    var simulation_script = 'set ns [new Simulator]' + EOL + EOL;
+
+                    var trace_file = $.trim($('#simulation-trace').val());
+                    if (trace_file.length == 0) {
+                        alert('Please specify a trace file name!');
+                        $("html, body").filter(':not(:animated)').animate({scrollTop: $('#simulation-trace').offset().top}, 800);
+                        return;
+                    }
+
+                    var temp_str = '$ns use-newtrace' + EOL;
+                    temp_str += 'set tracefile [open ' + trace_file + ' w]' + EOL;
+                    temp_str += '$ns trace-all $tracefile' + EOL + EOL;
+
+                    temp_str += 'proc finish {} {' + EOL;
+                    temp_str += '   global ns tracefile' + EOL;
+                    temp_str += '   $ns flush-trace' + EOL;
+                    temp_str += '   close $tracefile' + EOL;
+                    temp_str += '   exit 0' + EOL;
+                    temp_str += '}' + EOL + EOL;
+
+                    simulation_script += temp_str;
+                    
+
+                    if ($('#simulation-mode option:selected').val().toLowerCase() == 'wired') {
+                        // Nodes
+                        var nodes = $('#from-node-number option').length - 1;
+                        for (var i = 0; i < nodes; i++) {
+                            var a_node = 'set n' + i + ' [$ns node]';
+                            simulation_script += a_node + EOL;
+                        }
+                        simulation_script += EOL;
+
+                        // Links -- Wired mode
+                        $('#links-list tbody tr').each(function(index, row) {
+                            var node_from = $(row).children('td').eq(0).text();
+                            var node_to = $(row).children('td').eq(1).text();
+                            var link_type = $(row).children('td').eq(2).text();
+                            var bandwidth = $(row).children('td').eq(3).text();
+                            var delay = $(row).children('td').eq(4).text();
+                            var q_type = $(row).children('td').eq(5).text();
+                            var q_size = $(row).children('td').eq(6).text();
+
+                            var a_link = '$ns ' + link_type + ' $n' + node_from + ' $n' + node_to + ' ' + bandwidth + 'Mb ' + delay + 'ms ' + q_type;
+                            simulation_script += a_link + EOL;
+                            simulation_script += '$ns queue-limit $n' + node_from + ' $n' + node_to + ' ' + q_size;
+                            simulation_script += EOL;
+                        })
+                        simulation_script += EOL;                    
+                    }
+                    else {
+                        // Topography
+                        var topo_width = $('#topo-width').val();
+                        var topo_height = $('#topo-height').val();
+                        var nodes = $('#from-node-number option').length - 1;
+                        
+                        simulation_script += 'set topo [new Topography]' + EOL;
+                        simulation_script += '$topo load_flatgrid ' + topo_width + ' ' + topo_height + EOL + EOL;
+
+                        simulation_script += 'set god_ [create-god ' + nodes + ']' + EOL + EOL;
+
+                        // Channel
+                        simulation_script += 'set chan_1_ [new Channel/WirelessChannel]' + EOL + EOL;
+
+                        // Node configuration
+                        var mac = $('#wireless-mac option:selected').val();
+                        if (mac == '-1') {
+                            alert('Please specify a MAC type!');
+                            $("html, body").filter(':not(:animated)').animate({scrollTop: $('#wireless-mac').offset().top}, 800);
+                            return;
+                        }
+                        
+                        var q_type = $('#wireless-queue option:selected').val();
+                        if (q_type == '-1') {
+                            alert('Please specify a queue type!');
+                            $("html, body").filter(':not(:animated)').animate({scrollTop: $('#wireless-queue').offset().top}, 800);
+                            return;
+                        }
+                        
+                        var q_size = parseInt($('#wireless-q-len').val()) || -1;
+                        if (q_size < 0) {
+                            alert('Please specify a non-negative value for queue size!');
+                            $("html, body").filter(':not(:animated)').animate({scrollTop: $('#wireless-q-len').offset().top}, 800);
+                            return;
+                        }
+                        
+                        var routing_proto = $('#wireless-routing-protocol option:selected').val();
+                        if (routing_proto == '-1') {
+                            alert('Please specify a routing protocol for the nodes!');
+                            $("html, body").filter(':not(:animated)').animate({scrollTop: $('#wireless-routing-protocol').offset().top}, 800);
+                            return;
+                        }
+                        
+                        var trace_agt = $('#agent-trace').is(':checked') ? 'ON' : 'OFF';
+                        var trace_rtr = $('#router-trace').is(':checked') ? 'ON' : 'OFF';
+                        var trace_mac = $('#mac-trace').is(':checked') ? 'ON' : 'OFF';
+
+                        simulation_script += '$ns node-config -adhocRouting ' + routing_proto + ' \\' + EOL;
+                        simulation_script += '                -llType LL \\' + EOL;
+                        simulation_script += '                -macType ' + mac + ' \\' + EOL;
+                        simulation_script += '                -ifqType ' + q_type + ' \\' + EOL;
+                        simulation_script += '                -ifqLen ' + q_size + ' \\' + EOL;
+                        simulation_script += '                -antType Antenna/OmniAntenna \\' + EOL;
+                        simulation_script += '                -propType Propagation/TwoRayGround \\' + EOL;
+                        simulation_script += '                -phyType Phy/WirelessPhy \\' + EOL;
+                        simulation_script += '                -topoInstance $topo \\' + EOL;
+                        simulation_script += '                -agentTrace ' + trace_agt + ' \\' + EOL;
+                        simulation_script += '                -routerTrace ' + trace_rtr + ' \\' + EOL;
+                        simulation_script += '                -macTrace ' + trace_mac + ' \\' + EOL;
+                        simulation_script += '                -movementTrace OFF \\' + EOL;
+                        simulation_script += '                -channel $chan_1_' + EOL;
+                        simulation_script += EOL;
+                        
+                        // Nodes -- wireless nodes could be created only after 
+                        // the above configuration                        
+                        for (var i = 0; i < nodes; i++) {
+                            var a_node = 'set n' + i + ' [$ns node]';
+                            simulation_script += a_node + EOL;
+                        }
+                        simulation_script += EOL;
+                        
+                        // Node position
+                        $('#nodes-list tbody tr').each(function(index, row) {
+                            var node_id = $(row).children('td').eq(0).text();
+                            var xpos = $(row).children('td').eq(1).text();
+                            var ypos = $(row).children('td').eq(2).text();
+                            var random_motion = ($(row).children('td').eq(3).text().toLowerCase() == 'on') ? 1 : 0;
+
+                            var a_node = '$n' + node_id + ' set X_ ' + xpos + EOL;
+                            a_node += '$n' + node_id + ' set Y_ ' + ypos + EOL;
+                            a_node += '$n' + node_id + ' random-motion ' + random_motion + EOL;
+                            simulation_script += a_node + EOL;                            
+                        });                        
+                    }
+                    simulation_script += EOL;
+
+                    // Agents & Apps
+                    var itcp = 0;
+                    var iudp = 0;
+                    var iftp = 0;
+                    var icbr = 0;
+
+                    $('#agents-list tbody tr').each(function(index, row) {
+                        var agt_from = $(row).children('td').eq(0).text();
+                        var pkt_size = $(row).children('td').eq(1).text();
+                        var app = $(row).children('td').eq(2).text();
+                        var cbr_rate = $(row).children('td').eq(3).text();
+                        var cbr_size = $(row).children('td').eq(4).text();
+                        var node_from = $(row).children('td').eq(5).text();
+                        var agt_to = $(row).children('td').eq(6).text();
+                        var node_to = $(row).children('td').eq(7).text();
+                        var traffic_start = $(row).children('td').eq(8).text();
+                        var traffic_stop = $(row).children('td').eq(9).text();
+
+                        var temp_str = '';
+                        
+                        if (agt_from.toLowerCase().indexOf('tcp') >= 0) {
+                            temp_str = 'set tcp' + itcp + ' [new ' + agt_from + ']' + EOL;
+                            temp_str += '$ns attach-agent $n' + node_from + ' $tcp' + itcp + EOL;
+                            temp_str += 'set sink' + itcp + ' [new ' + agt_to + ']' + EOL;
+                            temp_str += '$ns attach-agent $n' + node_to + ' $sink' + itcp + EOL;
+                            temp_str += '$ns connect $tcp' + itcp + ' $sink' + itcp + EOL;
+                            temp_str += '$tcp' + itcp + ' set packetSize_ ' + pkt_size + EOL;
+
+                            // FTP with TCP
+                            temp_str += 'set ftp' + itcp + ' [new ' + app + ']' + EOL;
+                        	temp_str += '$ftp' + itcp + ' attach-agent $tcp' + itcp + EOL;
+
+                        	temp_str += EOL;
+                        	temp_str += '$ns at ' + traffic_start + ' "$ftp' + itcp + ' start"' + EOL;
+                        	temp_str += '$ns at ' + traffic_stop + ' "$ftp' + itcp + ' stop"' + EOL;
+                        	
+                            ++ itcp;
+                        }
+                        else {
+                            temp_str = 'set udp' + iudp + ' [new ' + agt_from + ']' + EOL;
+                            temp_str += '$ns attach-agent $n' + node_from + ' $udp' + iudp + EOL;
+                            temp_str += 'set null' + iudp + ' [new ' + agt_to + ']' + EOL;
+                            temp_str += '$ns attach-agent $n' + node_to + ' $null' + iudp + EOL;
+                            temp_str += '$ns connect $udp' + iudp + ' $null' + iudp + EOL;
+                            temp_str += '$udp' + iudp + ' set packetSize_ ' + pkt_size + EOL;
+
+                            // CBR with UDP
+                            temp_str += 'set cbr' + iudp + ' [new ' + app + ']' + EOL;
+                        	temp_str += '$cbr' + iudp + ' attach-agent $udp' + iudp + EOL;
+
+                        	temp_str += EOL;
+                        	temp_str += '$ns at ' + traffic_start + ' "$cbr' + iudp + ' start"' + EOL;
+                        	temp_str += '$ns at ' + traffic_stop + ' "$cbr' + iudp + ' stop"' + EOL;
+                        	
+                            ++ iudp;
+                        }
+                        simulation_script += temp_str + EOL;
+                    });
+
+
+                    var sim_stop = parseFloat($('#simulation-stop').val()) || -1;
+                    if (sim_stop <= 0) {
+                        alert('Please specify a positive value for simulation duration!');
+                        $("html, body").filter(':not(:animated)').animate({scrollTop: $('#simulation-stop').offset().top}, 800);
+                        return;
+                    }
+                                          
+                    temp_str = '$ns at ' + sim_stop + ' "finish"' + EOL;
+                    temp_str += '$ns run';
+
+                    simulation_script += temp_str;
+                    
+                    
+                    editAreaLoader.setValue('ns2code', simulation_script);                    
+                });
+            });
+            
+        </script>
+       
+    </body>
+
+</html>

@@ -1,0 +1,15 @@
+URL                                     Description                                                                 View
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+/ns2trace/                              Create a TraceAnalyzer object and store the records into it                 initialize(request)
+                                        (Initialize)
+
+/ns2trace/general_stats/                Return general stats about the simulation                                   general_stats(request)
+
+/ns2trace/avg_thruput/node_id/          Return average thruput for the given node ID                                avg_thruput(request, node_id)
+
+/ns2trace/plot/end2end_delay/src_node/dst_node/  Return a list of end-to-end delay between the source and           end2end_delay(request, src, dst)
+                                        destination nodes in the form [(seq#, delay)]
+
+/ns2trace/plot/pkt_retransmits/src_node/dst_node/   Return a list of pkt retransmissions from the source node       pkt_retransmits(request, src, dst)
+                                        to the destination node in the form [(seq#, retrnasmit_cnt)]

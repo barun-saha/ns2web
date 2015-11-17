@@ -1,0 +1,115 @@
+.ns2-code-output, .ns3-code-output {
+    background-color: #F0F0F0;
+    border: 1px ridge #0E8DE0;
+    padding: 5px;
+    width: 97.4%;
+}
+
+.wordwrap {
+   white-space: pre-wrap;      /* CSS3 */
+   white-space: -moz-pre-wrap; /* Firefox */
+   white-space: -pre-wrap;     /* Opera <7 */
+   white-space: -o-pre-wrap;   /* Opera 7 */
+   word-wrap: break-word;      /* IE */
+}
+
+.toolbar, .toolbar-other {
+    -moz-box-shadow: 0px 3px 5px #B0B0B0;   /* horizontal_offset vertical_offset blur_radius */
+    -webkit-box-shadow: 5px 5px 10px #B0B0B0;
+    box-shadow: 5px 5px 10px #B0B0B0;       /* For IE9 */
+    border: 1px solid #5CADFF; /*#a7c1f1;*/ /*bfd2f4;*/
+    border-bottom: 1px solid #7fa4e8;
+    padding: 5px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    /*width: 770px;*/
+    background-image: url(/ns2web/xmedia/images/new/ns2toolbar/toolbar-grad.png);
+    background-repeat: repeat-x;
+    display: inline;
+    display: block;
+    width: 900px;
+}
+.toolbar {
+    border-top: 0;
+}
+ul.toolbar-buttons, ul.toolbar-buttons li {
+    padding: 0;
+    margin: 0;
+}
+ul.toolbar-buttons li {
+    display: inline;
+    padding-right: 4px;
+    border-right: 1px solid silver;
+}
+ul.toolbar-buttons li.last-item {
+    border-right: 0;
+}
+ul.toolbar-buttons li a {
+    font-weight: bold;
+    color: #454545;
+    padding: 3px;
+}
+ul.toolbar-buttons li a:hover {
+    background-image: url(/ns2web/xmedia/images/new/ns2toolbar/item-hover.png);
+    background-repeat: repeat-x;
+    border: 1px solid white;
+    -moz-box-shadow: 0px 2px 2px #A0A0B0;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+#plotarea {
+    width: 900px; height: 410px; border: 1px dotted silver; padding: 5px;
+}
+.plot-legend-wrapper {
+}
+.plot-legend-wrapper a:hover {
+    background-image: url(/ns2web/xmedia/images/new/icons/cancel_12x12.png);
+    background-position: right;
+    background-repeat: no-repeat;
+    padding-right: 15px;
+}
+
+.slide-dialog {
+    -moz-box-shadow: 3px 3px 7px #B0B0B0;   /* horizontal_offset vertical_offset blur_radius */
+    -webkit-box-shadow: 5px 5px 10px #B0B0B0;
+    box-shadow: 5px 5px 10px #B0B0B0;       /* For IE9 */
+    border: 1px solid #a7c1f1; /*bfd2f4;*/
+    padding: 10px;
+}
+.close-dialog {
+    position: relative;
+    z-index: 91000;
+    background-image: url(/ns2web/xmedia/images/new/icons/cancel_16x16.png);
+    background-position: right;
+    background-repeat: no-repeat;
+    padding: 0;
+    border-bottom: 1px dotted silver;
+    text-align: left;
+    height: 25px;
+}
+
+.trace-file-mode {
+    padding-right: 2px;
+    padding-left: 2px;
+}
+
+.filtered-output {
+    display: block; height: 200px; overflow: scroll; border: 1px solid silver; margin-top: 5px;
+    width: 98.2%;
+}
+
+#pattern-match-count {
+    font-weight: bold;
+}
+
+.ns2-trace-text {
+    margin-bottom: 5px;border: 1px solid silver;
+    height: 40px; width: 900px; overflow: auto;
+}
+
+
+#clear {
+    border: 1px solid white;
+}
+

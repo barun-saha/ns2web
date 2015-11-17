@@ -1,0 +1,211 @@
+<html>
+    <head>
+        <title>ns2web: A web interface for simulation with ns2</title>
+        <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}css/isad.css">
+        <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}css/ns2workspace.css">    
+        
+        <style type="text/css">
+            .table-title-blue {
+                margin-bottom: 5px;
+                padding-bottom: 3px;
+                padding-top: 20px;
+                font-size: 1.1em;
+            }
+            
+            #contentBox {
+                font-size: 1.1em;
+            }
+            #contentBox table.techno {
+                font-size: 1em;
+            }
+            .input-container {
+                margin-left: 10px;
+                margin-right: 30px;
+                padding: 7px;
+                border: 1px dotted silver;
+            }
+        </style>
+    </head>
+
+    <body>              
+      
+        <div id="contentBoxBack">            
+            <div class="header" style="background-color: #E3F2FC; padding-top: 10px; 
+                 padding-bottom: 10px; padding-left: 25px; border-bottom: 1px solid #E3F2FC;">
+                <h1 class="site-header" style="color: #012943;">ns2web (Batch mode)</h1>
+            </div>
+            
+            <div id="contentBox" style="padding-top: 25px; padding-bottom: 20px;">                
+                <div class="ns2-form">
+                    <form action="" method="post">
+                        {% csrf_token %}
+                        
+                        <!--div class="ns2-gui">                                                        
+                            <div class="input-container">
+                                Please select simulation mode: 
+                                <select id="simulation-mode">
+                                    <option value="-1" selected>Simulation mode</option>
+                                    <option value="wired">Wired</option>
+                                    <option value="wireless">Wireless</option>
+                                </select>                                
+                            </div>                                                      
+                        </div-->                        
+                        
+                        <br>                        
+                        
+                        <div class="ns2-code">
+                            <textarea id="ns2code" style="width: 920px; height: 474px;" name="ns2code">{{ default_code }}</textarea>
+                        </div>
+                        
+
+                        <h2>Simulation Analysis Options</h2>
+                        <div id="analysis-dialog" style="margin: 10px;">
+                            <!--div id="metric-dialog">
+                                <select>
+                                    <option value="0" selected>Select a metric</option>
+                                    <option value="1">Bytes received</option>
+                                    <option value="2">End-to-end delay</option>
+                                    <option value="3">Hop count</option>
+                                </select>
+                            </div-->
+
+                            <div class="toolbar-other">
+                                <ul class="toolbar-buttons">
+                                    <li><strong>Simulation mode:</strong>
+                                        <input type="radio" name="trace-file-mode" class="trace-file-mode" value="Wired">Wired
+                                        <input type="radio" name="trace-file-mode" class="trace-file-mode" value="Wireless">Wireless (New)
+                                        <input type="radio" name="trace-file-mode" class="trace-file-mode" value="Wired">Satellite
+                                        <input type="radio" name="trace-file-mode" class="trace-file-mode" value="Mixed">Mixed
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <div class="toolbar" style="height: auto; margin-top: 0;">
+                                <ul class="toolbar-buttons">                                    
+                                    <!--li><a href="/" id="avg-thruput-dialog" title="Get average throughput of a node">Average Throughput</a></li-->
+                                    <li><a href="#" id="bytes-rcvd-dialog" title="Plot bytes received by a node (cumulative sum)">Bytes Received</a></li>
+                                    <li><a href="#" id="e2e-delay-dialog" title="Plot end-to-end delay between two nodes">End-to-end Delay</a></li>
+                                    <li><a href="#" id="pkt-retransmit-dialog" title="Plot packet retransmission count between two nodes">Packet Retransmissions</a></li>
+                                    <li class="last-item"><a href="/" id="hop-cnt-vs-seq-num-dialog" title="Plot hop count vs. sequence #s of packets sent between two nodes">Hop Count</a></li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <br>
+
+                        <div id="analysis-metrics" style="margin: 10px; margin-right: 30px; padding: 10px; border: 1px dotted silver;">
+                        </div>
+                        
+                        <br>
+                        
+
+                        <div class="ns2-code-submit centerAlign">
+                            <button type="button" id='run' class="button-icon">
+                                <img src="/ns2web/xmedia/images/new/icons/workspace/next24x24.png"
+                                     class="button-image buttonText button-run">
+                                <strong>Run!</strong>
+                            </button>
+                            <button type="button" id='clear' class="button-icon button-reset-icon">
+                                <img src="/ns2web/xmedia/images/new/icons/workspace/edit_clear24x24_b.png"
+                                     class="button-image buttonText button-clear">
+                                Clear
+                            </button>
+                        </div>
+                        
+                        
+                        <!--h3>Output</h3-->
+                        <div class="ns2-code-output" style="margin-top: 15px;">
+                        </div>
+
+                        
+                        <!--h2>Trace File</h2>
+                        <textarea class="ns2-trace-text wordwrap"></textarea>
+                        <div style="height: 15px; border: 0;">&nbsp;</div-->
+
+                        <!--h3 class="table-title-blue">Trace File Analysis</h3>
+                        <div id="trace-file-analysis" style="padding: 5px;">
+                            <div id="dummy"></div>
+
+                            <div class="toolbar-other">
+                                <ul class="toolbar-buttons">
+                                    <li><strong>Simulation mode:</strong>
+                                        <input type="radio" name="trace-file-mode" class="trace-file-mode" value="Wired">Wired
+                                        <input type="radio" name="trace-file-mode" class="trace-file-mode" value="Wireless">Wireless (New)
+                                        <input type="radio" name="trace-file-mode" class="trace-file-mode" value="Satellite">Satellite
+                                        <input type="radio" name="trace-file-mode" class="trace-file-mode" value="Mixed">Mixed
+                                    </li>
+                                    <li class="last-item" id="clear-session" style="padding-left: 5px;"><a href="/" title="Clear current session">Clear Session</a></li>
+                                </ul>
+                            </div>
+
+                            <div class="toolbar" style="height: auto; margin-top: 0; display: none;">
+                                <ul class="toolbar-buttons">
+                                    <li><a href="/" id="gen-stats" title="Get simulation statistics">General Statistics</a></li>
+                                    <li><a href="/" id="avg-thruput-dialog" title="Get average throughput of a node">Average Throughput</a></li>
+                                    <li><a href="/" id="bytes-rcvd-dialog" title="Plot bytes received by a node (cumulative sum)">Bytes Received</a></li>
+                                    <li><a href="/" id="e2e-delay-dialog" title="Plot end-to-end delay between two nodes">End-to-end Delay</a></li>
+                                    <li><a href="/" id="pkt-retransmit-dialog" title="Plot packet retransmission count between two nodes">Packet Retransmissions</a></li>
+                                    <li class="last-item"><a href="/" id="hop-cnt-vs-seq-num-dialog" title="Plot hop count vs. sequence #s of packets sent between two nodes">Hop Count</a></li>
+                                </ul>
+                            </div>
+
+                            <style type="text/css">
+                                .entry #contents table {
+                                    margin-left: 0;
+                                    margin-right: 0;
+                                    text-align: left;
+                                    width: auto;
+                                }
+                            </style>
+
+                            <div class="bluish marginT5" style="padding: 5px;">
+                                <div id="plotarea" style="margin-top: 10px;"></div>
+
+                                <h3 class="marginT5">Legend</h3>
+                                <div id="graphs-plotted" style="border: 1px dotted silver; width: 900px;">
+                                </div>
+                            </div>
+
+                        </div-->
+                    </form>
+
+                </div>
+            </div>
+            
+            <div class="footer" 
+                 style="background-color: #5CADFF; padding-top: 3px; padding-bottom: 3px; 
+                 font-size: 0.95em; text-align: center; color: white; border-top: 1px solid #E3F2FC;">
+                Copyright &COPY; 2011 Barun Saha
+            </div>
+            
+        </div>  
+
+        <script type="text/javascript" src="{{ MEDIA_URL }}js/jquery.min.js"></script>
+        <script type="text/javascript" src="{{ MEDIA_URL }}lib/TextArea_Resizer_1.0.4/jquery.textarearesizer.min.js"></script>
+        <script language="Javascript" type="text/javascript" src="{{ MEDIA_URL }}lib/editarea_0_8_2/edit_area/edit_area_full.js"></script>
+        <script type="text/javascript" src="{{ MEDIA_URL }}lib/smart_js_polling.js"></script>
+        
+        <script type="text/javascript" src="{{ MEDIA_URL }}js/enhancements.js"></script>
+        <!--script type="text/javascript" src="{{ MEDIA_URL }}lib/jquery.expose.min.js"></script-->
+
+        <link href="{{ MEDIA_URL }}css/jquery-ui.css" rel="stylesheet" type="text/css">
+        <script type="text/javascript" src="{{ MEDIA_URL }}js/jquery-ui.min.js"></script>
+        <!--[if IE]><script type="text/javascript" src="{{ MEDIA_URL }}js/excanvas.min.js"></script><![endif]-->
+        <!--script language="javascript" type="text/javascript" src="{{ MEDIA_URL }}lib/flot/jquery.flot.min.js"></script>
+        <script language="javascript" type="text/javascript" src="{{ MEDIA_URL }}lib/flot/flot-axislabels/jquery.flot.axislabels.min.js"></script>
+        <script language="javascript" type="text/javascript" src="{{ MEDIA_URL }}lib/flot/jquery.flot.navigate.min.js"></script>
+        <script language="javascript" type="text/javascript" src="{{ MEDIA_URL }}lib/flot/jquery.flot.crosshair.min.js"></script-->       
+
+        <script type="text/javascript" src="https://github.com/douglascrockford/JSON-js"></script>
+        <script type="text/javascript" src="{{ MEDIA_URL }}js/ant/ns2workspace_batch.js"></script>
+        
+        <script type="text/javascript">
+            
+            $(document).ready(function() {
+            });
+            
+        </script>
+       
+    </body>
+
+</html>
